@@ -1,0 +1,455 @@
+#CODE FOR MOST SIGNIFICANT BIT OF X
+
+
+int2float:	
+			LI 127
+			MOV R1,R0
+			LI 1
+			MOV R2,R0
+			ADD R1,R2
+			LW R0,RT	#retrieve parameter at 128
+			MOV R3,R0
+			LI 0
+			CLT R3,R0
+			J negative
+			LI 0
+			MOV R1,R0	#sign if input is positive
+			LI 8
+			SW R1,R0	#store sign if positive at 8
+			J absolute	
+
+negative:	
+			LI 1
+			MOV R1,R0	#sign if input is negative
+			LI 8
+			SW R1,R0	#store sign if negative at 8
+			SLL R3,R0
+			LI -1
+			SLL RT,R0
+			MOV R2,RT
+
+absolute:	
+			LI -0
+			ADD R0,R1   #negate the sign 
+			XOR R2,RT 	   
+			ADD R1,RT
+			MOV R2,RT 	#abs(x)
+			LI 9
+			SW R2,R0    #store abs(x) at 9
+			LI 0
+			LW R3,R0
+			LI 10
+			SW R3,R0    #store manbits = 0 at 10
+			LI 10
+			LW R3,R0
+			LI 11
+			SW R3,R0    #store exp = 10 at 11
+			LI 0
+			LW R3,R0
+			LI 12
+			SW R3,R0    #store truncated = 0 at 12
+
+numOfBits:	
+			MOV R3,R2	#copy of abs(x)
+			LI 0
+			CLT R3,R0
+			J manbits
+			CEQ R3,R0
+			J manbits
+			LI -1
+			SLL R3,R0
+			LI 10
+			LW R1,R0
+			LI 1
+			ADD R1,R0
+			LI 10 
+			SW RT,R0     #increment manbits by 1
+			J numOfBits
+
+manbits:	
+			LI 10
+			LW R1,R0	 
+			LI 0
+			CLT R1,R0
+			J sp3
+			CEQ R1,R0
+			J sp4
+			LI 10
+			LW R1,R0
+			LI 11
+			CLT R0,R1
+			J larger
+			CLT R1,R0
+			J smaller
+			J truncated
+
+larger:		
+			LI 12
+			LW R1,R0
+			LI 1
+			MOV R2,R0
+			LI 9
+			XOR R1,R0
+			AND RT,R2
+			LI 12
+			SW RT,R0	 #truncated after or & and
+			LI 9
+			LW R1,R0
+			LI -1
+			SLL R1,R0
+			LI 9
+			SW RT,R0	 #absx right shift by 1
+			LI 10
+			LW R1,R0
+			LI -1
+			MOV R2,R0
+			ADD R1,R2
+			LI 10
+			SW RT,R0	 #manbits decrements
+			LI 11
+			LW R1,R0
+			LI 1
+			MOV R2,R0
+			ADD R1,R2
+			LI 11
+			SW RT,R0	 #exp increments
+			LI 10
+			LW R1,R0
+			LI 11
+			CLT R0,R1
+			J larger	 #loop if manbits > 11
+			J truncated
+
+smaller:	
+			LI 9
+			LW R1,R0
+			LI 1
+			SLL R1,R0
+			LI 9
+			SW RT,R0	 #absx left shift by 1
+			LI 10
+			LW R1,R0
+			LI 1
+			MOV R2,R0
+			ADD R1,R2
+			LI 10
+			SW RT,R0	 #manbits increments
+			LI 11
+			LW R1,R0
+			LI -1
+			MOV R2,R0
+			ADD R1,R2
+			LI 11
+			SW RT,R0	 #exp decrements
+			LI 10
+			LW R1,R0
+			LI 11
+			CLT R1,R0
+			J smaller	 #loop if manbits < 11
+
+truncated:	
+			LI 11
+			LW R1,R0
+			LI 12
+			LW R2,R0
+			LI 15
+			ADD R1,R2
+			CLT RT,R0
+			J elseif
+			LI 11
+			LW R1,R0
+			LI 31
+			MOV R2,R0
+			LI 11
+			SW R2,R0
+			LI 9
+			LW R1,R0
+			LI 0
+			MOV R2,R0
+			LI 9
+			SW R2,R0
+
+elseif:		
+			LI 10
+			LW R1,R0	 
+			LI 0
+			CLT R1,R0
+			J end
+			CEQ R1,R0
+			J end
+			LI 11
+			LW R1,R0
+			LI 15
+			ADD R1,R0
+			LI 11
+			SW RT,R0
+
+end:		
+			LI 8
+			LW R1,R0
+			LI 15
+			SLL R1,R0 	
+			LI 8
+			SW RT,R0	 #sign << 15
+			LI 11
+			LW R1,R0
+			LI -0
+			ADD R1,R0
+			LI 10
+			SLL RT,R0
+			LI 11
+			SW RT,R0	 #(unsigned)exp << 10
+			LI 1
+			MOV R1,R0
+			LI 10
+			SLL R1,R0
+			LI -1
+			ADD RT,R0
+			LI 9
+			LW R1,R0
+			AND R1,RT
+			LI 9
+			SW RT,R0 	 #(absx & ((1u << 10) - 1))
+			LI 8
+			LW R1,R0
+			LI 11
+			LW R2,R0
+			LI 9
+			LW R3,R0
+			XOR R1,R2
+			XOR RT,R3
+			MOV R3,RT
+			LI 127
+			MOV R1,R0
+			LI 4
+			ADD R1,R0
+			SW R3,RT 	#return value at 131
+
+
+
+
+
+
+
+
+#CODE FOR LEAST SIGNIFICANT BIT OF X
+
+
+
+int2float2:	
+			LI 127
+			MOV R1,R0
+			LI 2
+			MOV R2,R0
+			ADD R1,R2
+			LW R0,RT	#retrieve parameter at 129
+			MOV R3,R0
+			LI 0
+			CLT R3,R0
+			J negative2
+			LI 0
+			MOV R1,R0	#sign if input is positive
+			LI 8
+			SW R1,R0	#store sign if positive at 8
+			J absolute2	
+
+negative2:	
+			LI 1
+			MOV R1,R0	#sign if input is negative
+			LI 8
+			SW R1,R0	#store sign if negative at 8
+			SLL R3,R0
+			LI -1
+			SLL RT,R0
+			MOV R2,RT
+
+absolute2:	
+			LI -0
+			ADD R0,R1   #negate the sign 
+			XOR R2,RT 	   
+			ADD R1,RT
+			MOV R2,RT 	#abs(x)
+			LI 9
+			SW R2,R0    #store abs(x) at 9
+			LI 0
+			LW R3,R0
+			LI 10
+			SW R3,R0    #store manbits = 0 at 10
+			LI 10
+			LW R3,R0
+			LI 11
+			SW R3,R0    #store exp = 10 at 11
+			LI 0
+			LW R3,R0
+			LI 12
+			SW R3,R0    #store truncated = 0 at 12
+
+numOfBits2:	
+			MOV R3,R2	#copy of abs(x)
+			LI 0
+			CLT R3,R0
+			J manbits2
+			CEQ R3,R0
+			J manbits2
+			LI -1
+			SLL R3,R0
+			LI 10
+			LW R1,R0
+			LI 1
+			ADD R1,R0
+			LI 10 
+			SW RT,R0     #increment manbits by 1
+			J numOfBits2
+
+manbits2:	
+			LI 10
+			LW R1,R0	 
+			LI 0
+			CLT R1,R0
+			J sp3
+			CEQ R1,R0
+			J sp4
+			LI 10
+			LW R1,R0
+			LI 11
+			CLT R0,R1
+			J larger2
+			CLT R1,R0
+			J smaller2
+			J truncated2
+
+larger2:	
+			LI 12
+			LW R1,R0
+			LI 1
+			MOV R2,R0
+			LI 9
+			XOR R1,R0
+			AND RT,R2
+			LI 12
+			SW RT,R0	 #truncated after or & and
+			LI 9
+			LW R1,R0
+			LI -1
+			SLL R1,R0
+			LI 9
+			SW RT,R0	 #absx right shift by 1
+			LI 10
+			LW R1,R0
+			LI -1
+			MOV R2,R0
+			ADD R1,R2
+			LI 10
+			SW RT,R0	 #manbits decrements
+			LI 11
+			LW R1,R0
+			LI 1
+			MOV R2,R0
+			ADD R1,R2
+			LI 11
+			SW RT,R0	 #exp increments
+			LI 10
+			LW R1,R0
+			LI 11
+			CLT R0,R1
+			J larger2	 #loop if manbits > 11
+			J truncated2
+
+smaller2:	
+			LI 9
+			LW R1,R0
+			LI 1
+			SLL R1,R0
+			LI 9
+			SW RT,R0	 #absx left shift by 1
+			LI 10
+			LW R1,R0
+			LI 1
+			MOV R2,R0
+			ADD R1,R2
+			LI 10
+			SW RT,R0	 #manbits increments
+			LI 11
+			LW R1,R0
+			LI -1
+			MOV R2,R0
+			ADD R1,R2
+			LI 11
+			SW RT,R0	 #exp decrements
+			LI 10
+			LW R1,R0
+			LI 11
+			CLT R1,R0
+			J smaller2	 #loop if manbits < 11
+
+truncated2:	
+			LI 11
+			LW R1,R0
+			LI 12
+			LW R2,R0
+			LI 15
+			ADD R1,R2
+			CLT RT,R0
+			J elseif2
+			LI 11
+			LW R1,R0
+			LI 31
+			MOV R2,R0
+			LI 11
+			SW R2,R0
+			LI 9
+			LW R1,R0
+			LI 0
+			MOV R2,R0
+			LI 9
+			SW R2,R0
+
+elseif2:	
+			LI 10
+			LW R1,R0	 
+			LI 0
+			CLT R1,R0
+			J end2
+			CEQ R1,R0
+			J end2
+			LI 11
+			LW R1,R0
+			LI 15
+			ADD R1,R0
+			LI 11
+			SW RT,R0
+
+end2:		
+			LI 8
+			LW R1,R0
+			LI 15
+			SLL R1,R0 	
+			LI 8
+			SW RT,R0	 #sign << 15
+			LI 11
+			LW R1,R0
+			LI -0
+			ADD R1,R0
+			LI 10
+			SLL RT,R0
+			LI 11
+			SW RT,R0	 #(unsigned)exp << 10
+			LI 1
+			MOV R1,R0
+			LI 10
+			SLL R1,R0
+			LI -1
+			ADD RT,R0
+			LI 9
+			LW R1,R0
+			AND R1,RT
+			LI 9
+			SW RT,R0 	 #(absx & ((1u << 10) - 1))
+			LI 8
+			LW R1,R0
+			LI 11
+			LW R2,R0
+			LI 9
+			LW R3,R0
+			XOR R1,R2
+	
