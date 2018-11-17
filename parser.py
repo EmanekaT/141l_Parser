@@ -59,7 +59,7 @@ with open(fname,'r') as fp, open(fname+'.bin', 'w') as of:
     line_num = 0
     for dirty_line in dirty_lines:
         # remove commands
-        line = dirty_line.replace('#','//').strip().split('//', 1)[0]
+        line = dirty_line.replace('#','//').strip().strip('\t').split('//', 1)[0]
         if line.isspace() or line == '':
             continue
         #parse
