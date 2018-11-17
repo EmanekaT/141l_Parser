@@ -46,7 +46,7 @@ def findLabels():
                         same line as commands at line:{}'.format(line_num)
                 assert (len(cmds) == 1), 'Error: label cannot be in the \
                         same line as commands at line:{}'.format(line_num)
-                labels[cmds[0][:-1]] = line_num
+                labels[cmds[0][:-1].lower()] = line_num
             else:
                 line_num += 1
     return labels
@@ -84,7 +84,7 @@ with open(fname,'r') as fp, open(fname+'.bin', 'w') as of:
             sys.stderr.write(itype[op]+ r1 + '\n')
         elif cmds[0].lower() == 'j':
             op = cmds[0].lower()
-            num = line_num - int(labels[cmds[1]])
+            num = line_num - int(labels[cmds[1].lower()])
             assert (num <= 63 and num >= -64), "Label out of range {}".format(num)
             r1 = twos_comp(7, num)
             of.write(itype[op]+ r1)
