@@ -80,7 +80,7 @@ with open(fname,'r') as fp, open(fname+'.bin', 'w') as of:
             if cmds[1][0] == '-':
                 num = -int(cmds[1][1:])
             r1 = twos_comp(7, num)
-            of.write(itype[op]+ r1 + '\n')
+            of.write(itype[op]+ r1)
             sys.stderr.write(itype[op]+ r1 + '\n')
         elif cmds[0].lower() == 'j':
             op = cmds[0].lower()
