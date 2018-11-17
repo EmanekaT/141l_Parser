@@ -29,7 +29,28 @@ itype = {
             'li':  '11',
         }
 regs = {"r0": '00', "r1": '01', "r2": '10', "r3": '11', 'rt': '00'}
-labels = {}
+def findLabels():
+    labels = {}
+    with open(fname,'r') as fp:
+        dirty_lines = fp.readlines()
+        line_num = 0
+        for dirty_line in dirty_lines:
+            # remove commands
+            line = dirty_line.replace('#','//').strip().split('//', 1)[0]
+            if line.isspace() or line == '':
+                continue
+            #parse
+            cmds = line.replace(',', ' ').split(' ')
+            if cmds[0][-1] == ':':
+                assert (cmds[0][:-1] not in labels), 'Error: duplicate labels \
+                        same line as commands at line:{}'.format(line_num)
+                assert (len(cmds) == 1), 'Error: label cannot be in the \
+                        same line as commands at line:{}'.format(line_num)
+                labels[cmds[0][:-1]] = line_num
+            else:
+                line_num += 1
+    return labels
+labels = findLabels()
 
 with open(fname,'r') as fp, open(fname+'.bin', 'w') as of:
     dirty_lines = fp.readlines()
@@ -52,7 +73,7 @@ with open(fname,'r') as fp, open(fname+'.bin', 'w') as of:
                 last_bit = '1'
             of.write(rtype[op]+ regs[r1]+ regs[r2]+last_bit)
             print(rtype[op]+ regs[r1]+ regs[r2]+last_bit)
-        elif cmds[0].lower() in itype.keys():
+        elif cmds[0].lower() == 'li':
             op = cmds[0].lower()
             num = int(cmds[1])
             if cmds[1][0] == '-':
@@ -60,13 +81,13 @@ with open(fname,'r') as fp, open(fname+'.bin', 'w') as of:
             r1 = twos_comp(7, num)
             of.write(itype[op]+ r1)
             print(itype[op]+ r1)
+        elif cmds[0].lower() == 'j':
+            op = cmds[0].lower()
+            r1 = str(line_num - int(labels[cmds[1]]))
+            of.write(itype[op]+ r1)
+            print(itype[op]+ r1)
         elif cmds[0][-1] == ':':
-            assert (cmds[0][:-1] not in labels), 'Error: duplicate labels \
-                    same line as commands at line:{}'.format(line_num)
-            assert (len(cmds) == 1), 'Error: label cannot be in the \
-                    same line as commands at line:{}'.format(line_num)
-            # How to handle labels????????????????????
-            labels[cmds[0][:-1]] = '0001'
+            continue
         else:
             raise Exception('Error: incorrect syntax at line:{}'.format(line_num))
 
