@@ -13,6 +13,7 @@ assert (len(args) == 2), 'wrong number of input'
 fname = args[1]
 assert (os.path.isfile(fname)), 'File does not exist'
 
+jump_map = {'sp1': -1, 'sp2': 0, 'sp3': 1, 'sp4': 2}
 rtype = {
             'and': '0010',
             'xor': '0001',
