@@ -29,6 +29,9 @@ itype = {
             'li':  '11',
         }
 regs = {"r0": '00', "r1": '01', "r2": '10', "r3": '11', 'rt': '00'}
+
+jump_map = {'sp1': -1, 'sp2': 0, 'sp3': 1, 'sp4': 2}
+
 def findLabels():
     labels = {}
     with open(fname,'r') as fp:
@@ -84,8 +87,10 @@ with open(fname,'r') as fp, open(fname+'.bin', 'w') as of:
             sys.stderr.write(itype[op]+ r1 + '\n')
         elif cmds[0].lower() == 'j':
             op = cmds[0].lower()
-            num = line_num - int(labels[cmds[1].lower()])
-            assert (num <= 63 and num >= -64), "Label out of range {}".format(num)
+            num = int(labels[cmds[1].lower()]) - line_num
+            if cmds[1].lower() in jump_map.keys():
+                num = jump_map[cmds[1].lower()]
+            assert ((num <= 63 and num >= -64) or cmds[1].lower() in jump_map.keys()), "Label out of range {}".format(num)
             r1 = twos_comp(7, num)
             of.write(itype[op]+ r1)
             sys.stderr.write(itype[op]+ r1 + '\n')
