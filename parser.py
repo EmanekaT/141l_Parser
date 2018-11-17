@@ -30,10 +30,8 @@ itype = {
         }
 regs = {"r0": '00', "r1": '01', "r2": '10', "r3": '11', 'rt': '00'}
 
-jump_map = {'sp1': -1, 'sp2': 0, 'sp3': 1, 'sp4': 2}
-
 def findLabels():
-    labels = {}
+    labels = {'sp1': -1, 'sp2': 0, 'sp3': 1, 'sp4': 2}
     with open(fname,'r') as fp:
         dirty_lines = fp.readlines()
         line_num = 0
