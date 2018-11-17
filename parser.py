@@ -63,7 +63,7 @@ with open(fname,'r') as fp, open(fname+'.bin', 'w') as of:
         if line.isspace() or line == '':
             continue
         #parse
-        cmds = line.replace(',', ' ').split(' ')
+        cmds = list(filter(None, line.replace(',', ' ').split(' ')))
         sys.stderr.write(str(cmds) + '\n')
         if cmds[0].lower() in rtype.keys():
             op = cmds[0].lower()
