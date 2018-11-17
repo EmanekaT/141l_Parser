@@ -74,7 +74,7 @@ with open(fname,'r') as fp, open(fname+'.bin', 'w') as of:
             last_bit = '0'
             if r2 == 'rt' or op == 'ceq' or op == 'clt':
                 last_bit = '1'
-            of.write(rtype[op]+ regs[r1]+ regs[r2]+last_bit)
+            of.write(rtype[op]+ regs[r1]+ regs[r2]+last_bit + '\n')
             sys.stderr.write(rtype[op]+ regs[r1]+ regs[r2]+last_bit + '\n')
         elif cmds[0].lower() == 'li':
             op = cmds[0].lower()
@@ -82,7 +82,7 @@ with open(fname,'r') as fp, open(fname+'.bin', 'w') as of:
             if cmds[1][0] == '-':
                 num = -int(cmds[1][1:])
             r1 = twos_comp(7, num)
-            of.write(itype[op]+ r1)
+            of.write(itype[op]+ r1 + '\n')
             sys.stderr.write(itype[op]+ r1 + '\n')
         elif cmds[0].lower() == 'j':
             op = cmds[0].lower()
@@ -91,7 +91,7 @@ with open(fname,'r') as fp, open(fname+'.bin', 'w') as of:
                 num = jump_map[cmds[1].lower()]
             assert ((num <= 63 and num >= -64) or cmds[1].lower() in jump_map.keys()), "Label out of range {}".format(num)
             r1 = twos_comp(7, num)
-            of.write(itype[op]+ r1)
+            of.write(itype[op]+ r1 + '\n')
             sys.stderr.write(itype[op]+ r1 + '\n')
         elif cmds[0][-1] == ':':
             continue
