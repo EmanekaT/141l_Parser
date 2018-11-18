@@ -1,0 +1,322 @@
+//set addr 136 to 0
+LI 63
+MOV R1 R0  // r2 = 127
+ADD R1 R1
+LI 10
+MOV R1 RT       // r3 = 136
+ADD R0 R1 // r2 = 136
+mov R1 RT
+LI 0
+SW R0 R1 // save 0 to 136
+
+//set addr 137 to 0
+LI 63
+MOV R1 R0 // r2 = 127
+ADD R1 R1
+LI 11
+MOV R1 RT // r3 = 136
+ADD R0 R1 // r2 = 136
+mov R1 RT
+LI 0
+SW R0 R1 // save 0 to 136
+
+// extract X to R2, R3
+LI 63
+MOV R1 R0
+ADD R1 R1 //RT = 126
+MOV R1 RT
+LI 7
+ADD R0 R1 
+mov R1 RT //R1 = 133
+LW R2 R1 // r2 is addr 133
+
+LI 63
+MOV R1 R0
+ADD R1 R1 //RT = 126
+MOV R1 RT
+LI 8
+ADD R0 R1 
+MOV R1 RT //R1 = 134
+LW R3 R1 // r3 is addr 134
+
+
+// set R1 to e
+LI -2
+SLL R2 R0
+MOV R1 RT
+LI 31 
+AND R0 R1
+MOV R1 RT
+
+//compare 0 and e, and save result to r2
+LI 0
+CLT R0 R1 // R0 is CEQ flag now
+MOV R2 RT // R2 is CEQ flag now
+
+//compare 31 and r1, and save result to r3
+LI 31
+CLT R1 R0
+MOV R3 RT // R3 is CEQ flag now
+
+AND R2 R3
+J sp2
+
+//save e to 144
+MOV R2 R1
+LI 63
+MOV R1 R0
+ADD R1 R1
+LI 18
+MOV R1 RT
+ADD R0 R1 
+mov R1 RT
+SW R2 R1
+MOV R1 R2
+
+// R1 = e, addr 144 = e
+// set R2 to e-23
+LI -23
+ADD R1 R0
+MOV R2 RT
+
+//R3 is 1 <<(e-23)
+LI 1
+SLL R0 R2
+MOV R3 RT 
+
+//R1 is e, R2 is e -24, R3 is 1 << (e-23)
+LI -24
+ADD R1 R0
+MOV R2 RT 
+
+// save 1 << (e-23) to 140
+LI 63
+MOV R1 R0
+ADD R1 R1
+LI 14
+MOV R1 RT
+ADD R0 R1
+mov R1 RT
+SW R3 R1 // save 0 to 136
+
+// save e - 24 to 141
+LI 63
+MOV R1 R0
+ADD R1 R1
+LI 15
+MOV R1 RT
+ADD R0 R1
+mov R1 RT
+SW R2 R1
+
+// addr 144 = e, addr 141 = e - 24, addr 140 = 1 << e - 23
+// set R3 to (the first 8 bits of the X) & 0b00000011
+LI 63
+MOV R1 R0
+ADD R1 R1
+MOV R1 RT
+LI 7
+ADD R0 R1
+mov R1 RT
+LW R3 R1   
+LI 3
+AND R0 R3
+MOV R3 RT 
+
+// R2 is (e-24)shift
+LI 63
+MOV R1 R0
+ADD R1 R1
+MOV R1 RT
+LI 15
+ADD R0 R1
+mov R1 RT
+LW R2 R2
+
+// Get t << shift, last 2 bits, and store the value to 142
+SLL R3 R2
+MOV R3 RT
+LI 63
+MOV R1 R0
+ADD R1 R1
+MOV R1 RT
+LI 16
+ADD R0 R1
+mov R1 RT
+SW R3 R2
+
+// R3 is the last 8 bits
+LI 63
+MOV R1 R0
+ADD R1 R1
+MOV R1 RT
+LI 8
+ADD R0 R1
+mov R1 RT
+LW R3 R1
+
+//R2 is shift-8
+LI 63
+MOV R1 R0
+ADD R1 R1
+MOV R1 RT
+LI 15
+ADD R0 R1
+mov R1 RT
+LW R2 R1
+LI -8
+ADD R2 R0
+MOV R2 R0
+// Get t << shift, last 6 bits
+SLL R3 R2
+MOV R3 RT
+// load from 142 to R2
+LI 63
+MOV R1 R0
+ADD R1 R1
+MOV R1 RT
+LI 16
+ADD R0 R1
+mov R1 RT
+LW R2 R1
+XOR R2 R3
+MOV R3 RT
+
+// R3 has the first 8 bits of the (t << shift), load 1 << (e-23) to R2
+LI 63
+MOV R1 R0 // r2 = 127
+ADD R1 R1
+LI 14
+MOV R1 RT
+ADD R0 R1 // r1 = 136
+mov R1 RT
+LW R2 R1 
+// 1 << (e-15) ^ (t << shift) for the first 8 bits
+XOR R2 R3
+MOV R3 RT
+//move it to memory addr 136
+LI 63
+MOV R1 R0
+ADD R1 R1
+MOV R1 RT
+LI 10
+ADD R0 R1
+mov R1 RT
+SW R3 R1
+
+//R2 is shift
+LI 63
+MOV R1 R0
+ADD R1 R1
+MOV R1 RT
+LI 15
+ADD R0 R1
+mov R1 RT
+LW R2 R1
+
+//R3 is the last 8 bits
+LI 63
+MOV R1 R0
+ADD R1 R1
+MOV R1 RT
+LI 8
+ADD R0 R1
+mov R1 RT
+LW R3 R1
+
+// shift the last 8 bits by shift
+SLL R3 R2
+MOV R3 RT
+
+// set R2 to e (e is stored in addr 144)
+LI 63
+MOV R2 R0
+ADD R2 R2
+MOV R2 RT
+LI 18
+ADD R0 R2
+mov R2 RT
+LW R1 R2 
+MOV R2 R1
+
+//Set R2 to e-15
+LI -15
+ADD R2 R0
+MOV R2 RT
+
+// set R2 to 1 << e-15
+LI 1
+SLL R0 R2
+MOV R2 RT
+
+// 1 << e-15 ^ (t << shift)
+XOR R2 R3
+MOV R3 RT
+
+//save the last 8 bits for result to addr 137
+LI 63
+ADD R0 R0
+MOV R1 RT
+LI 11
+ADD R0 R1
+MOV R1 RT
+SW R3 R1
+
+END:
+LI 63
+MOV R1 R0
+ADD R1 R1
+MOV R1 RT
+LI 10
+ADD R0 R1
+mov R1 RT
+LW R2 R1   // R2 is addr 136 now
+LI 63
+MOV R1 R0
+ADD R1 R1
+LI 1
+ADD R0 R1 //RT is 127 now
+MOV R1 RT //R1 is 127 now
+AND R2 R1
+MOV R1 RT //RT is 127 & addr 136 now
+LI -1
+XOR R0 R1 // the first 8 bits of the result
+MOV R3 RT
+LI 63
+MOV R1 R0 // r2 = 127
+ADD R1 R1
+LI 10
+MOV R2 RT // r3 = 9
+ADD R1 R2 // r2 = 136
+mov R2 RT
+LI 0
+SW R3 R2 //save the first 8 bits
+
+LI 63
+MOV R1 R0
+ADD R1 R1
+MOV R1 RT
+LI 11
+ADD R0 R1
+mov R1 RT
+LW R2 R1   // R2 is addr 137 now
+LI -64
+MOV R1 R0
+ADD R1 R1
+MOV R1 RT
+ADD R1 R1
+MOV R1 RT //R1 is -256
+AND R2 R1
+MOV R1 RT //R1 is -256 & addr 137 now
+LI -1
+XOR R0 R1 // the first 8 bits of the result
+MOV R3 RT // R3 contains the last 8 bits
+LI 63
+MOV R1 R0 // r2 = 127
+ADD R1 R1
+LI 11
+MOV R2 RT // r3 = 11
+ADD R1 R2 // r2 = 137
+mov R2 RT
+LI 0
+SW R3 R2 //save the last 8 bits
