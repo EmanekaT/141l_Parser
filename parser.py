@@ -15,7 +15,7 @@ assert (os.path.isfile(fname)), 'File does not exist'
 
 jump_map = {'sp1': -1, 'sp2': 0, 'sp3': 1, 'sp4': 2}
 rtype = {
-            'and': '0010',
+            'and': '0000',
             'xor': '0001',
             'add': '0010',
             'mov': '0111',
@@ -54,8 +54,6 @@ def findLabels():
     return labels
 labels = findLabels()
 
-print(twos_comp(7,-24))
-
 with open(fname,'r') as fp, open(fname+'.bin', 'w') as of:
     dirty_lines = fp.readlines()
     line_num = 0
@@ -66,13 +64,13 @@ with open(fname,'r') as fp, open(fname+'.bin', 'w') as of:
             continue
         #parse
         cmds = list(filter(None, line.replace(',', ' ').split(' ')))
-        sys.stderr.write(str(cmds) + '\n')
+        sys.stderr.write(str(cmds) + str(line_num)+ '\n')
         if cmds[0].lower() in rtype.keys():
             op = cmds[0].lower()
             r1 = cmds[1].lower()
             r2 = cmds[2].lower()
             last_bit = '0'
-            if r2 == 'rt' or op == 'ceq' or op == 'clt':
+            if r2== 'rt' or r1 == 'rt' or op == 'ceq' or op == 'clt':
                 last_bit = '1'
             of.write(rtype[op]+ regs[r1]+ regs[r2]+last_bit + '\n')
             sys.stderr.write(rtype[op]+ regs[r1]+ regs[r2]+last_bit + '\n')
