@@ -1,0 +1,99 @@
+// Program1
+
+// MEM[0-40] Message
+// MEM[61] = preLength
+// MEM[62] = LFSR_ptrn
+// MEM[63] = LFSR
+// MEM[64- 127] = Encripted Result
+
+	li 32
+	add r0, r0 // now we have 64 in rt
+	mov r3, rt // move encription starter memory address 64 to r3
+	li 32
+	mov r2, r0 	// move white space character to r2
+Loop:
+	sw r2, r3 	// store the white space character to memory 
+	li 1	
+	add r3, r0	// memorry address increments, store to rt
+	mov r3, rt	// update r3
+	li 63
+	add r0, r0 // now we have 126 in rt
+	li 1
+	add rt, r0 // now we have 127 in rt
+	mov r0, rt // let r0 equal to 127
+	ceq r0, r3 	// compare the current address with the final address
+	J END		// jump tp End if current memory address is equal to the final address 
+	li 1
+	add r0, r0 	// Update RT to be not zero
+	J Loop 		// jump tp Loop
+End:	
+	li 61
+	mov r3, r0 	// move preLength memory address to r3
+	lw r3, r3	// load r3 with the preLength 
+	li 32
+	add r0, r0	// Now we have 64 in rt
+	mov r0, rt 	// Now we have 64 in r0 
+	mov r2, r0 	// move encription starter memory address to r2
+	add r3, r2 	// Get the encription memory address after a preLength
+	mov r3, rt	// update r3, now r3 is the ncription memory address after a preLength
+	li 0
+	mov r2, r0	// set r2 to string index 0
+	li 41
+	mov r1, r0 	// move final string index address 41 to r1
+Loop1:
+	lw r0, r2	// Load the character from the current string memory address r0
+	sw r0, r3	// Store that character in r0 to the memory address r3
+	li 1
+	add r3, r0	// memorry address increments, store to rt
+	mov r3, rt	// update r3 
+	li 1
+	add r2, r0	// string memorry address increments, store to rt
+	mov r2, rt	// update r2
+	li 41
+	ceq r0, r2 	// compare the current string memorry address with the final address
+	J END1		// jump tp End if current memory address is equal to the final address 
+	li 1
+	add r0, r0 	// Update RT to be 2
+	J Loop1 		// jump tp Loop
+End1:
+
+	li 63
+	lw r2, r0 	// load the LFSR from the memory address r0
+	mov r1, r0 	// let r1 equal to 63
+	li 1
+	add r1, r0 // now we hab 64 in rt
+	mov r3, rt // move encription starter memory address 64 to r3
+	
+Loop2:
+
+	lw r0, r3  	// load the current character to r0 from the memory address r3
+	xor r0, r2	// bitwise xor operation (current character ^ LFSR) to rt
+	sw rt, r3 	// update the xor result to current memory location r3
+	li 1	
+	add r3, r0	// memorry address increments, store to rt
+	mov r3, rt	// update r3
+	
+	li 62
+	lw r1, r0	// load r1 with the LFSR_pattern
+	and r1, r2  // bitwise and operation between r1(LFSR_pattern) and r2(LFSR), result in rt
+	mov r1, rt	// move the and result to r1
+	xor r1, r1	// the parity bit pattern will be stored in rt 
+	mov r1, rt	// update r1 with the parity bit pattern
+	li 1
+	sll r2, r0 	// left shift LFSR with 1 bit, result in rt
+	xor rt, r1	// bitwise or oeration between the parity bit and shifted LFSR, result in rt
+	li 63
+	sw rt, r0	// store the updated LFSR back to the memory address 63
+	
+	li 63
+	add r0, r0 // now we have 126 in rt
+	li 1
+	add rt, r0 // now qw habe 127 in rt
+	mov r0, rt // let r0 equal to 127
+	
+	ceq r0, r3 	// compare the current address with the final address
+	J End2		// jump tp End if current memory address is equal to the final address 
+	li 1
+	add r0, r0 	// Update RT to be zero
+	J Loop2 		// jump tp Loop
+End2:
