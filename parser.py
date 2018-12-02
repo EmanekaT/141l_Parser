@@ -12,8 +12,8 @@ args = sys.argv
 assert (len(args) == 2), 'wrong number of input'
 fname = args[1]
 assert (os.path.isfile(fname)), 'File does not exist'
-
-jump_map = {'sp1': -1, 'sp2': 0, 'sp3': 1, 'sp4': 2}
+# sp2 = 229, sp7 = 112, sp6 = 408
+jump_map = {'sp1': -1, 'sp2': 0, 'sp3': 1, 'sp4': 2, 'sp5': -2, 'sp6': 3, 'sp7': -3}
 rtype = {
             'and': '0000',
             'xor': '0001',
@@ -32,7 +32,7 @@ itype = {
 regs = {"r0": '00', "r1": '01', "r2": '10', "r3": '11', 'rt': '00'}
 
 def findLabels():
-    labels = {'sp1': -1, 'sp2': 0, 'sp3': 1, 'sp4': 2}
+    labels = {'sp1': -1, 'sp2': 0, 'sp3': 1, 'sp4': 2, 'sp5': -2, 'sp6': 3, 'sp7': -3}
     with open(fname,'r') as fp:
         dirty_lines = fp.readlines()
         line_num = 0

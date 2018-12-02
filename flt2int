@@ -1,387 +1,661 @@
-//set addr 136 to 0
-LI 63
-MOV R1 R0  // r2 = 127
-ADD R1 R1
-LI 10
-MOV R1 RT       // r3 = 136
-ADD R0 R1 // r2 = 136
-mov R1 RT
-LI 0
-SW R0 R1 // save 0 to 136
-
-//set addr 137 to 0
-LI 1
-ADD R1 R0
-MOV R1 RT // r3 = 136
-LI 0
-SW R0 R1 // save 0 to 136
-
-// extract X to R2, R3
+// r1 = 0
 LI 63
 MOV R1 R0
-ADD R1 R1 //RT = 126
+ADD R1 R1
+LI 10
+MOV R1 RT
+ADD R0 R1
+mov R1 RT
+LI 0
+SW R0 R1 
+
+// r2 = 0
+LI 1
+ADD R1 R0
+MOV R1 RT 
+LI 0
+SW R0 R1 
+
+// extract a to R2
+LI 63
+MOV R1 R0
+ADD R1 R1 
 MOV R1 RT
 LI 7
 ADD R0 R1 
-mov R1 RT //R1 = 133
-LW R2 R1 // r2 is addr 133
-
-LI 63
-MOV R1 R0
-ADD R1 R1 //RT = 126
-MOV R1 RT
-LI 8
-ADD R0 R1 
-MOV R1 RT //R1 = 134
-LW R3 R1 // r3 is addr 134
+mov R1 RT
+LW R2 R1
 
 
-# R2 = MEM[133], R3 = MEM[134] MEM[136] = 0, MEM[137] = 0
+# R2 = a, MEM[136] = 0, MEM[137] = 0
 
-// set R1 to e
+// set R3 to e
 LI -2
 SLL R2 R0
 MOV R1 RT
 LI 31 
 AND R0 R1
-MOV R1 RT
+MOV R3 RT
+# R3 = e, R2 = MEM[133], MEM[136] = 0, MEM[137] = 0
 
-# R1 = e, R2 = MEM[133], R3 = MEM[134] MEM[136] = 0, MEM[137] = 0
-
-//compare 0 and e, and save result to r2
-LI 0
-CLT R0 R1 // R0 is CEQ flag now
-MOV R2 RT // R2 is CEQ flag now
-
-//compare 31 and r1, and save result to r3
-LI 31
-CLT R1 R0
-MOV R3 RT // R3 is CEQ flag now
-
-AND R2 R3
-LI 0
-MOV R2 RT
-XOR R0 R2
-J sp2
-
-# R1 = e, MEM[136] = 0, MEM[137] = 0
-
-//save e to 144
-MOV R2 R1
+//save e to 138
 LI 63
 MOV R1 R0
-ADD R1 R1
-LI 18
+ADD R1 R1 
 MOV R1 RT
+LI 12
+ADD R0 R1 
+mov R1 RT 
+SW R3 R1
+# R2 = MEM[133], R3 = e, MEM[136] = 0, MEM[137] = 0, MEM[138] = e
+
+LI 3
+AND R0 R2
+MOV R2 RT 
+# R2 = man1, R3 = e, MEM[136] = 0, MEM[137] = 0, MEM[138] = e
+
+# --------------------------------------------------------------------------------------------
+// if e > 29
+LI 29
+CLT R0 R3
+LI 1
+MOV R1 RT
+XOR R0 R1
+J if1_end
+
+LI -1
+MOV R2 R0
+# R3 = e, R2 = r2, MEM[136] = 0, MEM[137] = 0, MEM[138] = e
+
+// save r2 to 136
+LI 63
+MOV R1 R0  
+ADD R1 R1
+MOV R1 RT
+LI 11
+ADD R0 R1 
+mov R1 RT
+SW R2 R1 
+# R3 = e, R2 = r2, MEM[136] = 0, MEM[137] = r2, MEM[138] = e
+
+LI -1
+MOV R2 R0
+
+LI 63
+MOV R1 R0  
+ADD R1 R1
+MOV R1 RT
+LI 10
 ADD R0 R1 
 mov R1 RT
 SW R2 R1
-MOV R1 R2
+# R3 = e, R2 = r1, MEM[136] = r1, MEM[137] = r2, MEM[138] = e
 
-# R1 = e, MEM[144] = e, MEM[136] = 0, MEM[137] = 0
+J sp6
 
-// R1 = e, addr 144 = e
-// set R2 to e-23
-LI -23
-ADD R1 R0
-MOV R2 RT
+if1_end:
+# --------------------------------------------------------------------------------------------
 
-# R1 = e, R2 = e - 23, MEM[144] = e, MEM[136] = 0, MEM[137] = 0
-
-//R3 is 1 <<(e-23)
-LI 1
-SLL R0 R2
-MOV R3 RT 
-
-//R1 is e, R2 is e -24, R3 is 1 << (e-23)
-LI -24
-ADD R1 R0
-MOV R2 RT 
-
-// save 1 << (e-23) to 140
 LI 63
-MOV R1 R0
+MOV R1 R0  
 ADD R1 R1
-LI 14
 MOV R1 RT
-ADD R0 R1
-mov R1 RT
-SW R3 R1 
-
-// save e - 24 to 141
-LI 63
-MOV R1 R0
-ADD R1 R1
-LI 15
-MOV R1 RT
-ADD R0 R1
+LI 13
+ADD R0 R1 
 mov R1 RT
 SW R2 R1
+# R2 = man1, R3 = e, MEM[136] = 0, MEM[137] = 0, MEM[138] = e, MEM[139]= man1
 
-# R2=e-24,  MEM[140] = 1 << (e - 23), MEM[141] = e - 24, MEM[144] = e, MEM[136] = 0, MEM[137] = 0
+# --------------------------------------------------------------------------------------------
+LI 14
+CLT R0 R3
+MOV R1 RT
+LI 1
+XOR R0 R1
+J sp2
 
-// addr 144 = e, addr 141 = e - 24, addr 140 = 1 << e - 23
-// set R3 to (the first 8 bits of the X) & 0b00000011
+LI -25
+ADD R3 R0
+MOV R3 RT
+SLL R2 R3
+MOV R3 RT
+# R2 = man1, R3 = man << e - 25, MEM[136] = 0, MEM[137] = 0, MEM[138] = e, MEM[139]= man1
+
 LI 63
-MOV R1 R0
+MOV R1 R0  
 ADD R1 R1
 MOV R1 RT
-LI 7
-ADD R0 R1
+LI 14
+ADD R0 R1 
 mov R1 RT
-LW R3 R1   
-LI 3
-AND R0 R3
-MOV R3 RT 
+SW R3 R1
 
-# R2=shift, R3 = t1,  MEM[140] = 1 << (e - 23), MEM[141] = shift, MEM[144] = e, MEM[136] = 0, MEM[137] = 0
-
-// Get t1 << shift, last 2 bits, and store the value to 142
-SLL R3 R2
-MOV R3 RT
 LI 63
-MOV R1 R0
+MOV R1 R0  
+ADD R1 R1
+MOV R1 RT
+LI 12
+ADD R0 R1 
+mov R1 RT
+LW R3 R1
+# R2 = man1, R3 = e, MEM[136] = 0, MEM[137] = 0, MEM[138] = e, MEM[139]= man1, MEM[140] = man1 << (e - 25)
+
+LI -17
+ADD R3 R0
+MOV R3 RT
+SLL R2 R3
+LI 63
+MOV R1 R0  
+ADD R1 R1
+MOV R1 RT
+LI 15
+ADD R0 R1 
+mov R1 RT
+SW R3 R1
+# R2 = man1, R3 = man1 << e - 17, MEM[136] = 0, MEM[137] = 0, MEM[138] = e, MEM[139]= man1, MEM[140] = man1 << (e - 25), MEM[141] = man1 << e - 17
+
+LI 63
+MOV R1 R0  
+ADD R1 R1
+MOV R1 RT
+LI 12
+ADD R0 R1 
+mov R1 RT
+LW R3 R1
+
+LI -16
+ADD R3 R0
+MOV R3 RT
+SLL R2 R3
+
+LI 63
+MOV R1 R0  
 ADD R1 R1
 MOV R1 RT
 LI 16
-ADD R0 R1
+ADD R0 R1 
 mov R1 RT
 SW R3 R1
+# R2 = man1, R3 = man1 << e - 16, MEM[136] = 0, MEM[137] = 0, MEM[138] = e, MEM[139]= man1, MEM[140] = man1 << (e - 25), MEM[141] = man1 << e - 17, MEM[142] = man1 << e - 16
 
-# R2=shift, R3 = t1 << shift,  MEM[140] = 1 << (e - 23), MEM[141] = shift, MEM[142] = t1 << shift, MEM[144] = e, MEM[136] = 0, MEM[137] = 0
+
 LI 63
-MOV R1 R0
+MOV R1 R0  
 ADD R1 R1
 MOV R1 RT
-LI 7
-ADD R0 R1
+LI 12
+ADD R0 R1 
 mov R1 RT
-LW R3 R1   
-LI 3
-AND R0 R3
-MOV R3 RT 
-LI -8
-ADD R0 R2
-MOV R2 RT
+LW R3 R1
 
-# R2=shift - 8, R3 = t1,  MEM[140] = 1 << (e - 23), MEM[141] = shift, MEM[142] = t1 << shift, MEM[144] = e, MEM[136] = 0, MEM[137] = 0
-SLL R3 R2
-MOV R3 RT
+SLL R2 R3
+
 LI 63
-MOV R1 R0
+MOV R1 R0  
 ADD R1 R1
 MOV R1 RT
 LI 17
-ADD R0 R1
+ADD R0 R1 
 mov R1 RT
 SW R3 R1
+# R2 = man1, R3 = man1 << e - 16, MEM[136] = 0, MEM[137] = 0, MEM[138] = e, MEM[139]= man1, MEM[140] = man1 << (e - 25), MEM[141] = man1 << e - 17, MEM[142] = man1 << e - 16, MEM[143] = man1 << e
 
-# R2=shift - 8, R3 = t1 << shift - 8,  MEM[140] = 1 << (e - 23), MEM[141] = shift, MEM[142] = t1 << shift, MEM[143] = t1 << shift - 8, MEM[144] = e, MEM[136] = 0, MEM[137] = 0
 
 LI 63
-MOV R1 R0
+MOV R1 R0  
 ADD R1 R1
 MOV R1 RT
 LI 8
-ADD R0 R1
-mov R1 RT
-LW R3 R1 
-
-# R2=shift - 8, R3 = t2,  MEM[140] = 1 << (e - 23), MEM[141] = shift, MEM[142] = t1 << shift, MEM[143] = t1 << shift - 8, MEM[144] = e, MEM[136] = 0, MEM[137] = 0
-LI 16
-ADD R0 R2
-MOV R2 RT
-
-# R2=shift + 8, R3 = t2,  MEM[140] = 1 << (e - 23), MEM[141] = shift, MEM[142] = t1 << shift, MEM[143] = t1 << shift - 8, MEM[144] = e, MEM[136] = 0, MEM[137] = 0
-SLL R3 R2
-MOV R2 RT
-LI 63
-MOV R1 R0
-ADD R1 R1
-MOV R1 RT
-LI 19
-ADD R0 R1
-mov R1 RT
-SW R2 R1
-
-# R2=t2 << shift + 8, R3 = t2,  MEM[140] = 1 << (e - 23), MEM[141] = shift, MEM[142] = t1 << shift, MEM[143] = t1 << shift - 8, MEM[144] = e, MEM[136] = 0, MEM[137] = 0, MEM[145] = t2 << shift + 8
-LI 63
-MOV R1 R0
-ADD R1 R1
-MOV R1 RT
-LI 15
-ADD R0 R1
-mov R1 RT
-LW R2 R1 
-
-# R2=shift, R3 = t2,  MEM[140] = 1 << (e - 23), MEM[141] = shift, MEM[142] = t1 << shift, MEM[143] = t1 << shift - 8, MEM[144] = e, MEM[136] = 0, MEM[137] = 0, MEM[145] = t2 << shift + 8
-SLL R3 R2
-MOV R2 RT
-LI 63
-MOV R1 R0
-ADD R1 R1
-MOV R1 RT
-LI 20
-ADD R0 R1
-mov R1 RT
-SW R2 R1
-
-# R2=t2 << shift, R3 = t2,  MEM[140] = 1 << (e - 23), MEM[141] = shift, MEM[142] = t1 << shift,
-# MEM[143] = t1 << shift - 8, MEM[144] = e, MEM[136] = 0, MEM[137] = 0, MEM[145] = t2 << shift + 8,
-# MEM[146] = t2 << shift
-LI 63
-MOV R1 R0
-ADD R1 R1
-MOV R1 RT
-LI 14
-ADD R0 R1
+ADD R0 R1 
 mov R1 RT
 LW R2 R1
+# R2 = man2
 
 LI 63
-MOV R1 R0
+MOV R1 R0  
 ADD R1 R1
 MOV R1 RT
-LI 16
-ADD R0 R1
+LI 12
+ADD R0 R1 
 mov R1 RT
 LW R3 R1
+# R2 = man2, R3 = e
 
-# R2=1 << (e - 23), R3 = t1 << shift,  MEM[140] = 1 << (e - 23), MEM[141] = shift, MEM[142] = t1 << shift,
-# MEM[143] = t1 << shift - 8, MEM[144] = e, MEM[136] = 0, MEM[137] = 0, MEM[145] = t2 << shift + 8,
-# MEM[146] = t2 << shift
-XOR R2 R3
-MOV R2 RT
+LI -25
+ADD R3 R0
+MOV R3 RT
+SLL R2 R3
+MOV R3 RT
+# R2 = man2, R3 = man2 << e - 25
 
 LI 63
-MOV R1 R0
-ADD R1 R1
-MOV R1 RT
-LI 19
-ADD R0 R1
-mov R1 RT
-LW R3 R1
-
-XOR R2 R3
-MOV R2 RT
-
-# R2=r1, R3 = t2 << shift + 8,  MEM[140] = 1 << (e - 23), MEM[141] = shift, MEM[142] = t1 << shift,
-# MEM[143] = t1 << shift - 8, MEM[144] = e, MEM[136] = 0, MEM[137] = 0, MEM[145] = t2 << shift + 8,
-# MEM[146] = t2 << shift
-
-//save r1
-LI 63
-MOV R1 R0
-ADD R1 R1
-MOV R1 RT
-LI 10
-ADD R0 R1
-mov R1 RT
-SW R2 R1
-
-# R2=r1, R3 = t2 << shift + 8,  MEM[140] = 1 << (e - 23), MEM[141] = shift, MEM[142] = t1 << shift,
-# MEM[143] = t1 << shift - 8, MEM[144] = e, MEM[136] = r1, MEM[137] = 0, MEM[145] = t2 << shift + 8,
-# MEM[146] = t2 << shift
-
-// get 1 << (e - 15)
-LI 63
-MOV R1 R0
+MOV R1 R0  
 ADD R1 R1
 MOV R1 RT
 LI 18
-ADD R0 R1
+ADD R0 R1 
 mov R1 RT
-LW R1 R1
+SW R3 R1
+# R2 = man2, R3 = man2 << e - 25, MEM[136] = 0, MEM[137] = 0, MEM[138] = e, MEM[139]= man1, MEM[140] = man1 << (e - 25), MEM[141] = man1 << e - 17, MEM[142] = man1 << e - 16, MEM[143] = man1 << e, MEM[144] = man2 << e - 25
 
-# R2=r1, R1 = e
-LI -15
-ADD R1 R0
-MOV R1 RT
-LI 1
-SLL R0 R1
-MOV R2 RT
-
-# R2=1 << (e - 15), R1 = e
+// load e
 LI 63
-MOV R1 R0
+MOV R1 R0  
 ADD R1 R1
 MOV R1 RT
-LI 17
-ADD R0 R1
+LI 12
+ADD R0 R1 
 mov R1 RT
 LW R3 R1
+# R2 = man2, R3 = e
 
-# R2=1 << (e - 15), R3 = t1 << shift - 8
-XOR R2 R3
-MOV R2 RT
+LI -33
+ADD R3 R0
+MOV R3 RT
+SLL R2 R3
+MOV R3 RT
+
 LI 63
-MOV R1 R0
+MOV R1 R0  
+ADD R1 R1
+MOV R1 RT
+LI 19
+ADD R0 R1 
+mov R1 RT
+SW R3 R1
+# R2 = man2, R3 = man2 << e - 33, MEM[136] = 0, MEM[137] = 0, MEM[138] = e, MEM[139]= man1, MEM[140] = man1 << (e - 25), MEM[141] = man1 << e - 17, MEM[142] = man1 << e - 16, MEM[143] = man1 << e, MEM[144] = man2 << e - 25, MEM[144] = man2 << e - 33
+
+
+// load e
+LI 63
+MOV R1 R0  
+ADD R1 R1
+MOV R1 RT
+LI 12
+ADD R0 R1 
+mov R1 RT
+LW R3 R1
+# R2 = man2, R3 = e
+
+LI -8
+ADD R3 R0
+MOV R3 RT
+SLL R2 R3
+MOV R3 RT
+
+LI 63
+MOV R1 R0  
 ADD R1 R1
 MOV R1 RT
 LI 20
-ADD R0 R1
+ADD R0 R1 
+mov R1 RT
+SW R3 R1
+# R2 = man2, R3 = man2 << e - 33, MEM[136] = 0, MEM[137] = 0, MEM[138] = e, MEM[139]= man1, MEM[140] = man1 << (e - 25), MEM[141] = man1 << e - 17, MEM[142] = man1 << e - 16, MEM[143] = man1 << e, MEM[144] = man2 << e - 25, MEM[144] = man2 << e - 33, MEM[145] = e - 8
+
+
+// load e
+LI 63
+MOV R1 R0  
+ADD R1 R1
+MOV R1 RT
+LI 12
+ADD R0 R1 
 mov R1 RT
 LW R3 R1
-XOR R2 R3
-MOV R2 RT
+# R2 = man2, R3 = e
 
-# R2=r2, R3 = t2 << shift
-//save r2
-LI 63
-MOV R1 R0
-ADD R1 R1
-MOV R1 RT
-LI 11
-ADD R0 R1
-mov R1 RT
-SW R2 R1
-
-# R2=r2, R3 = t2 << shift,  MEM[140] = 1 << (e - 23), MEM[141] = shift, MEM[142] = t1 << shift,
-# MEM[143] = t1 << shift - 8, MEM[144] = e, MEM[136] = r1, MEM[137] = r2, MEM[145] = t2 << shift + 8,
-# MEM[146] = t2 << shift
-
-END:
-LI 1
-MOV R2 R0
-LI 7
-SLL R2 R0
+LI -24
+ADD R3 R0
+MOV R3 RT
+SLL R2 R3
+MOV R3 RT
 
 LI 63
-MOV R1 R0
+MOV R1 R0  
 ADD R1 R1
 MOV R1 RT
-LI 11
-ADD R0 R1
+LI 21
+ADD R0 R1 
 mov R1 RT
 SW R3 R1
 
-# R2 = 0b10000000, R3 = r1
-AND R2 R3
-MOV R2 RT
+# R2 = man2, R3 = man2 << e - 33, MEM[136] = 0, MEM[137] = 0, MEM[138] = e, MEM[139]= man1, MEM[140] = man1 << (e - 25), MEM[141] = man1 << e - 17, MEM[142] = man1 << e - 16, MEM[143] = man1 << e, MEM[144] = man2 << e - 25, MEM[144] = man2 << e - 33, MEM[145] = man2 << e - 8, MEM[146] = man2 << e - 24
 
-# R2 = 0b10000000, R3 = r1 & 0b10000000
+
+
+// load man1 << (e-25)
 LI 63
-MOV R1 R0
+MOV R1 R0  
 ADD R1 R1
 MOV R1 RT
-LI 7
-ADD R0 R1
+LI 14
+ADD R0 R1 
 mov R1 RT
+LW R2 R1
 
-# R1 = a, R2 = 0b10000000, R3 = r1 & 0b10000000
-AND R1 R2
-MOV R2 RT
-
-# R2 = s, R3 = r1 & 0b10000000
-XOR R3 R2
-MOV R2 RT
-
-//save r2
+// load man2 << (e-33)
 LI 63
-MOV R1 R0
+MOV R1 R0  
+ADD R1 R1
+MOV R1 RT
+LI 18
+ADD R0 R1 
+mov R1 RT
+LW R3 R1
+
+// xor to get r1
+XOR R2 R3
+MOV R2 RT
+
+// update r1
+LI 63
+MOV R1 R0  
 ADD R1 R1
 MOV R1 RT
 LI 10
-ADD R0 R1
+ADD R0 R1 
 mov R1 RT
 SW R2 R1
+
+
+
+// load man1 << (e-17)
+LI 63
+MOV R1 R0  
+ADD R1 R1
+MOV R1 RT
+LI 15
+ADD R0 R1 
+mov R1 RT
+LW R2 R1
+
+// load man2 << (e-25)
+LI 63
+MOV R1 R0  
+ADD R1 R1
+MOV R1 RT
+LI 17
+ADD R0 R1 
+mov R1 RT
+LW R3 R1
+
+// xor to get r2
+XOR R2 R3
+MOV R2 RT
+
+// update r2
+LI 63
+MOV R1 R0  
+ADD R1 R1
+MOV R1 RT
+LI 11
+ADD R0 R1 
+mov R1 RT
+SW R2 R1
+
+if2_end:
+
+# --------------------------------------------------------------------------------------------
+# MEM[136] = r1, MEM[137] = r2, MEM[138] = e, 
+# MEM[139]= man1, MEM[140] = man1 << (e - 25), 
+# MEM[141] = man1 << e - 17, MEM[142] = man1 << e - 16, 
+# MEM[143] = man1 << e, MEM[144] = man2 << e - 25, 
+# MEM[144] = man2 << e - 33, MEM[145] = man2 << e - 8, 
+# MEM[146] = man2 << e - 24
+
+
+// load e
+LI 63
+MOV R1 R0  
+ADD R1 R1
+MOV R1 RT
+LI 12
+ADD R0 R1 
+mov R1 RT
+LW R2 R1
+# R2 = e
+
+LI 25
+CLT R2 R0
+MOV R3 RT
+LI 14
+CLT R0 R2
+MOV R2 RT
+ADD R2 R3
+MOV R2 RT
+LI 2
+CEQ R2 R0
+MOV R1 RT
+LI 1
+XOR R0 R1
+J sp7
+
+// load man1 << (e - 17)
+LI 63
+MOV R1 R0  
+ADD R1 R1
+MOV R1 RT
+LI 15
+ADD R0 R1 
+mov R1 RT
+LW R2 R1
+// R2 == 1
+LI 1
+CEQ R2 R0
+MOV R2 RT
+
+// load man2 << (e - 25)
+LI 63
+MOV R1 R0  
+ADD R1 R1
+MOV R1 RT
+LI 18
+ADD R0 R1 
+mov R1 RT
+LW R3 R1
+// R3 == 1
+LI 1
+CEQ R3 R0
+MOV R3 RT
+
+LI 63
+MOV R1 R0  
+ADD R1 R1
+MOV R1 RT
+LI 18
+ADD R0 R1 
+mov R1 RT
+LW R3 R1
+// R3 == 1
+LI 1
+CEQ R3 R0
+MOV R3 RT
+
+// R2 || R3
+ADD R2 R3
+MOV R2 RT
+
+LI 63
+MOV R1 R0  
+ADD R1 R1
+MOV R1 RT
+LI 19
+ADD R0 R1 
+mov R1 RT
+LW R3 R1
+// R3 == 0
+LI 0
+CEQ R3 R0
+MOV R3 RT
+// R3 != 0
+LI 1
+XOR R0 R3
+MOV R3 RT
+
+// || ||
+ADD R2 R3
+MOV R2 RT
+
+LI 63
+MOV R1 R0  
+ADD R1 R1
+MOV R1 RT
+LI 17
+ADD R0 R1 
+mov R1 RT
+LW R3 R1
+// R3 == 0
+LI 0
+CEQ R3 R0
+MOV R3 RT
+// R3 != 0
+LI 1
+XOR R0 R3
+MOV R3 RT
+ADD R2 R3
+MOV R2 RT
+
+# --------------------------------------------------------------------------------------------
+LI 0
+CLT R0 R2
+MOV R2 RT
+XOR R0 R2
+J if3_end
+
+// load man2 << e -24
+LI 63
+MOV R1 R0  
+ADD R1 R1
+MOV R1 RT
+LI 20
+ADD R0 R1 
+mov R1 RT
+LW R2 R1
+
+// load man1 << e -16
+LI 63
+MOV R1 R0  
+ADD R1 R1
+MOV R1 RT
+LI 16
+ADD R0 R1 
+mov R1 RT
+LW R3 R1
+
+// xor & 1 
+XOR R2 R3
+MOV R2 RT
+LI 1
+AND R2 R0
+MOV R2 RT
+
+// load r2
+LI 63
+MOV R1 R0  
+ADD R1 R1
+MOV R1 RT
+LI 11
+ADD R0 R1 
+mov R1 RT
+LW R3 R1
+
+// r2 + xor & 1
+ADD R2 R3
+MOV R2 RT
+
+// save rounded r2
+LI 63
+MOV R1 R0  
+ADD R1 R1
+MOV R1 RT
+LI 11
+ADD R0 R1 
+mov R1 RT
+SW R2 R1
+
+if3_end:
+
+# --------------------------------------------------------------------------------------------
+
+// load a
+LI 63
+MOV R1 R0  
+ADD R1 R1
+MOV R1 RT
+LI 10
+ADD R0 R1 
+mov R1 RT
+LW R2 R1
+
+LI 1
+MOV R1 R0
+LI 7
+SLL R1 R0
+MOV R3 RT
+
+// load r1
+LI 63
+MOV R1 R0  
+ADD R1 R1
+MOV R1 RT
+LI 10
+ADD R0 R1 
+mov R1 RT
+LW R2 R1
+
+XOR R2 R3
+MOV R2 RT
+
+// store r1
+LI 63
+MOV R1 R0  
+ADD R1 R1
+MOV R1 RT
+LI 10
+ADD R0 R1 
+mov R1 RT
+SW R2 R1
+
+// load e
+LI 63
+MOV R1 R0  
+ADD R1 R1
+MOV R1 RT
+LI 12
+ADD R0 R1 
+mov R1 RT
+LW R2 R1
+
+LI 14
+CLT R0 R2
+J END
+
+LI 0
+MOV R2 R0
+
+// r1 = 0
+LI 63
+MOV R1 R0  
+ADD R1 R1
+MOV R1 RT
+LI 10
+ADD R0 R1 
+mov R1 RT
+SW R2 R1
+
+LI 63
+MOV R1 R0  
+ADD R1 R1
+MOV R1 RT
+LI 11
+ADD R0 R1 
+mov R1 RT
+SW R2 R1
+
+END:
+
+
+
+
+

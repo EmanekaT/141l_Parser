@@ -81,15 +81,19 @@ manbits:
 			J larger
 			CLT R1,R0
 			J smaller
-			J truncated
+			J sp5
 
 larger:		
 			LI 12
 			LW R1,R0
 			LI 1
 			MOV R2,R0
+			XOR R1,R2
+			MOV R1,RT
 			LI 9
-			XOR R1,R0
+			XOR R0,R2
+			AND RT,R1
+			XOR RT,R2
 			AND RT,R2
 			LI 12
 			SW RT,R0	 #truncated after or & and
@@ -214,9 +218,22 @@ end:
 			LW R1,R0
 			LI 11
 			LW R2,R0
-			LI 9
+			LI 1
 			LW R3,R0
-			XOR R1,R2
+			XOR R1,R3
+			MOV R1,RT
+			XOR R2,R3
+			MOV R2,RT
+			AND R1,R2
+			XOR RT,R3
+			MOV R1,RT
+			LI 9
+			LW R2,R0
+			XOR R1,R3
+			MOV R1,RT
+			XOR R2,R3
+			MOV R2,RT
+			AND R1,R2
 			XOR RT,R3
 			MOV R3,RT
 			LI 127
@@ -316,15 +333,19 @@ manbits2:
 			J larger2
 			CLT R1,R0
 			J smaller2
-			J truncated2
+			J sp5
 
 larger2:	
 			LI 12
 			LW R1,R0
 			LI 1
 			MOV R2,R0
+			XOR R1,R2
+			MOV R1,RT
 			LI 9
-			XOR R1,R0
+			XOR R0,R2
+			AND RT,R1
+			XOR RT,R2
 			AND RT,R2
 			LI 12
 			SW RT,R0	 #truncated after or & and
@@ -449,7 +470,26 @@ end2:
 			LW R1,R0
 			LI 11
 			LW R2,R0
-			LI 9
+			LI 1
 			LW R3,R0
-			XOR R1,R2
-	
+			XOR R1,R3
+			MOV R1,RT
+			XOR R2,R3
+			MOV R2,RT
+			AND R1,R2
+			XOR RT,R3
+			MOV R1,RT
+			LI 9
+			LW R2,R0
+			XOR R1,R3
+			MOV R1,RT
+			XOR R2,R3
+			MOV R2,RT
+			AND R1,R2
+			XOR RT,R3
+			MOV R3,RT
+			LI 127
+			MOV R1,R0
+			LI 5
+			ADD R1,R0
+			SW R3,RT 	#return value at 132
