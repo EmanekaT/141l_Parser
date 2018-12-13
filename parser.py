@@ -70,7 +70,7 @@ with open(fname,'r') as fp, open(fname+'.bin', 'w') as of:
             r1 = cmds[1].lower()
             r2 = cmds[2].lower()
             last_bit = '0'
-            if r2== 'rt' or r1 == 'rt' or op == 'ceq' or op == 'clt':
+            if r2== 'rt' or r1 == 'rt' or op == 'ceq':
                 last_bit = '1'
             of.write(rtype[op]+ regs[r1]+ regs[r2]+last_bit + '\n')
             sys.stderr.write(rtype[op]+ regs[r1]+ regs[r2]+last_bit + '\n')
